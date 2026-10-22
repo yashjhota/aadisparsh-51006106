@@ -29,6 +29,13 @@
       "when": 1792639216159,
       "tag": "0003_enable_pgcrypto",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1792639233355,
+      "tag": "0004_fix_claim_superadmin_crypt_schema",
+      "breakpoints": true
     }
   ]
 }
