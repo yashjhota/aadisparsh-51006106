@@ -29,6 +29,17 @@ async function assertStaff(supabase: Sb, userId: string, templeId: string) {
   return { orgId: t.organization_id, admin: supabaseAdmin };
 }
 
+/** PostgREST caps responses at 1000 rows; page through everything. */
+async function fetchAll<T>(make: (from: number, to: number) => PromiseLike<{ data: T[] | null; error: unknown }>): Promise<T[]> {
+  const out: T[] = [];
+  for (let from = 0; ; from += 1000) {
+    const { data, error } = await make(from, from + 999);
+    if (error) throw new Error("Could not load devotees");
+    out.push(...(data ?? []));
+    if (!data || data.length < 1000) return out;
+  }
+}
+
 function istDate(offsetDays = 0): string {
   return new Date(Date.now() + 5.5 * 3600 * 1000 + offsetDays * 86400000).toISOString().slice(0, 10);
 }
@@ -52,24 +63,29 @@ export const searchDevotees = createServerFn({ method: "POST" })
   }))
   .handler(async ({ context, data }): Promise<{ total: number; rows: DevoteeRow[] }> => {
     const { orgId, admin } = await assertStaff(context.supabase as Sb, context.userId, data.templeId);
-    const [{ data: fams }, { data: regs }] = await Promise.all([
-      admin
-        .from("family_profiles")
-        .select(
-          "id, full_name, city, rep:profiles!family_profiles_family_representative_user_id_fkey(id, full_name, phone, city, legacy_member_number)"
-        )
-        .eq("organization_id", orgId)
-        .limit(10000),
-      admin.from("registrations").select("family_profile_id, status").eq("temple_id", data.templeId).limit(20000),
+    const [fams, regs] = await Promise.all([
+      fetchAll((a, b) =>
+        admin
+          .from("family_profiles")
+          .select(
+            "id, full_name, city, rep:profiles!family_profiles_family_representative_user_id_fkey(id, full_name, phone, city, legacy_member_number)"
+          )
+          .eq("organization_id", orgId)
+          .order("id")
+          .range(a, b)
+      ),
+      fetchAll((a, b) =>
+        admin.from("registrations").select("family_profile_id, status").eq("temple_id", data.templeId).order("id").range(a, b)
+      ),
     ]);
     const counts = new Map<string, { v: number; u: number }>();
-    for (const r of regs ?? []) {
+    for (const r of regs) {
       const c = counts.get(r.family_profile_id) ?? { v: 0, u: 0 };
       if (r.status === "completed") c.v++;
       if (r.status === "upcoming") c.u++;
       counts.set(r.family_profile_id, c);
     }
-    const all: DevoteeRow[] = (fams ?? []).map((f) => {
+    const all: DevoteeRow[] = fams.map((f) => {
       const p = f.rep as unknown as {
         id: string; full_name: string; phone: string | null; city: string | null; legacy_member_number: string | null;
       };
@@ -228,7 +244,7 @@ export const getReminders = createServerFn({ method: "POST" })
     const today = istDate(0);
     const md = today.slice(5);
 
-    const [{ data: regs }, { data: fams }, { data: anniv }, { data: logs }] = await Promise.all([
+    const [{ data: regs }, fams, { data: anniv }, { data: logs }] = await Promise.all([
       admin
         .from("registrations")
         .select(
@@ -238,11 +254,14 @@ export const getReminders = createServerFn({ method: "POST" })
         .eq("visit_date", data.date)
         .eq("status", "upcoming")
         .order("created_at"),
-      admin
-        .from("family_profiles")
-        .select("id, rep:profiles!family_profiles_family_representative_user_id_fkey(full_name, phone, date_of_birth)")
-        .eq("organization_id", orgId)
-        .limit(10000),
+      fetchAll((a, b) =>
+        admin
+          .from("family_profiles")
+          .select("id, rep:profiles!family_profiles_family_representative_user_id_fkey(full_name, phone, date_of_birth)")
+          .eq("organization_id", orgId)
+          .order("id")
+          .range(a, b)
+      ),
       admin
         .from("registrations")
         .select("family_profile_id, occasion_date")
@@ -278,7 +297,7 @@ export const getReminders = createServerFn({ method: "POST" })
     });
 
     const famMap = new Map<string, { name: string; phone: string | null; dob: string | null }>();
-    for (const f of fams ?? []) {
+    for (const f of fams) {
       const p = f.rep as unknown as { full_name: string; phone: string | null; date_of_birth: string | null } | null;
       famMap.set(f.id, { name: p?.full_name || "—", phone: p?.phone ?? null, dob: p?.date_of_birth ?? null });
     }
