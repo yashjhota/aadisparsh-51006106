@@ -249,8 +249,8 @@ function AdminConsole({ data, onDone }: { data: AdminData; onDone: () => void })
           placeholder="Search by name or email…"
           className="mt-5 w-full rounded-lg border border-input bg-card px-3 py-2 text-sm sm:max-w-sm"
         />
-        <div className="card-raised mt-4 overflow-hidden">
-          <table className="w-full text-sm">
+        <div className="card-raised mt-4 overflow-x-auto">
+          <table className="w-full min-w-[36rem] text-sm">
             <thead>
               <tr className="border-b border-border bg-secondary/40 text-left text-xs text-muted-foreground">
                 <th className="px-4 py-2.5 font-medium">Name</th>

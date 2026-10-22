@@ -165,6 +165,19 @@
   }
 }
 
+/*
+ * Mobile inputs: iOS Safari auto-zooms the page when a focused control has
+ * font-size < 16px. Keep form controls at 16px on phones (unlayered rule
+ * wins over the text-sm utility there).
+ */
+@media (max-width: 767px) {
+  input:not([type="checkbox"]):not([type="radio"]):not([type="submit"]):not([type="button"]),
+  select,
+  textarea {
+    font-size: 16px;
+  }
+}
+
 @media print {
   body:has(.visit-pass) * { visibility: hidden; }
   .visit-pass, .visit-pass * { visibility: visible; }
