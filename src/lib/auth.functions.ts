@@ -30,10 +30,35 @@ export const signUpWithMobile = createServerFn({ method: "POST" })
       user_metadata: { full_name: data.fullName, phone: `+91${data.mobile}`, signup_method: "mobile" },
     });
     if (error) {
-      const msg = /already|registered|exists/i.test(error.message)
-        ? "This mobile number is already registered. Please sign in."
-        : error.message;
-      return { ok: false, error: msg };
+      if (/already|registered|exists/i.test(error.message)) {
+        // Devotee imported from OneDigital who hasn't set a password yet: let them claim it once.
+        const { data: prof } = await supabaseAdmin
+          .from("profiles")
+          .select("id")
+          .eq("phone", `+91${data.mobile}`)
+          .maybeSingle();
+        if (prof) {
+          const { data: claim } = await supabaseAdmin
+            .from("legacy_import_accounts")
+            .update({ claimed_at: new Date().toISOString() })
+            .eq("user_id", prof.id)
+            .is("claimed_at", null)
+            .select("user_id")
+            .maybeSingle();
+          if (claim) {
+            const { error: pwErr } = await supabaseAdmin.auth.admin.updateUserById(prof.id, {
+              password: data.password,
+            });
+            if (pwErr) {
+              await supabaseAdmin.from("legacy_import_accounts").update({ claimed_at: null }).eq("user_id", prof.id);
+              return { ok: false, error: pwErr.message };
+            }
+            return { ok: true };
+          }
+        }
+        return { ok: false, error: "This mobile number is already registered. Please sign in." };
+      }
+      return { ok: false, error: error.message };
     }
     return { ok: true };
   });
