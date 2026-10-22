@@ -5,6 +5,8 @@ import { SiteHeader, SiteFooter } from "@/components/site-chrome";
 import { useI18n } from "@/lib/i18n";
 import { toast } from "sonner";
 import { Loader2 } from "lucide-react";
+import { signUpWithMobile } from "@/lib/auth.functions";
+import { mobileToEmail, normalizeMobile } from "@/lib/mobile-auth";
 
 export const Route = createFileRoute("/auth")({
   validateSearch: (search: Record<string, unknown>) => ({
@@ -31,36 +33,57 @@ function safeRedirect(target: string | undefined): string {
   return "/account";
 }
 
+const inputCls = "w-full rounded-lg border border-input bg-card px-3 py-2 text-sm";
+const btnCls =
+  "flex w-full items-center justify-center gap-2 rounded-lg bg-primary px-4 py-2.5 text-sm font-semibold text-primary-foreground transition-colors hover:bg-primary-deep disabled:opacity-60";
+
 function AuthPage() {
   const { redirect } = Route.useSearch();
   const navigate = useNavigate();
   const { t } = useI18n();
+  const [audience, setAudience] = useState<"devotee" | "staff">("devotee");
   const [mode, setMode] = useState<"signin" | "signup">("signin");
   const [email, setEmail] = useState("");
+  const [mobile, setMobile] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [fullName, setFullName] = useState("");
-  const [phone, setPhone] = useState("");
   const [busy, setBusy] = useState(false);
-  const [pendingEmail, setPendingEmail] = useState<string | null>(null);
 
   useEffect(() => {
-    // Already signed in? Go straight to the account page.
     supabase.auth.getSession().then(({ data }) => {
       if (data.session) navigate({ to: safeRedirect(redirect), replace: true });
     });
   }, [navigate, redirect]);
 
+  async function signInWith(loginEmail: string) {
+    const { error } = await supabase.auth.signInWithPassword({ email: loginEmail, password });
+    if (error) {
+      toast.error(
+        audience === "devotee" && /invalid/i.test(error.message)
+          ? "Incorrect mobile number or password."
+          : error.message || t("auth.signInFailed"),
+      );
+      return false;
+    }
+    navigate({ to: safeRedirect(redirect), replace: true });
+    return true;
+  }
+
   async function handleSignIn(e: React.FormEvent) {
     e.preventDefault();
     setBusy(true);
     try {
-      const { error } = await supabase.auth.signInWithPassword({ email, password });
-      if (error) {
-        toast.error(error.message || t("auth.signInFailed"));
-        return;
+      if (audience === "staff") {
+        await signInWith(email.trim());
+      } else {
+        const m = normalizeMobile(mobile);
+        if (!m) {
+          toast.error("Enter a valid 10-digit mobile number");
+          return;
+        }
+        await signInWith(mobileToEmail(m));
       }
-      navigate({ to: safeRedirect(redirect), replace: true });
     } finally {
       setBusy(false);
     }
@@ -68,112 +91,105 @@ function AuthPage() {
 
   async function handleSignUp(e: React.FormEvent) {
     e.preventDefault();
-    if (password !== confirmPassword) {
-      toast.error(t("auth.passwordMismatch"));
-      return;
-    }
-    if (password.length < 8) {
-      toast.error(t("auth.passwordShort"));
-      return;
-    }
+    if (password !== confirmPassword) return void toast.error(t("auth.passwordMismatch"));
+    if (password.length < 8) return void toast.error(t("auth.passwordShort"));
+    const m = normalizeMobile(mobile);
+    if (!m) return void toast.error("Enter a valid 10-digit mobile number");
     setBusy(true);
     try {
-      const { data, error } = await supabase.auth.signUp({
-        email,
-        password,
-        options: {
-          emailRedirectTo: window.location.origin,
-          data: { full_name: fullName, phone: phone || null },
-        },
-      });
-      if (error) {
-        toast.error(error.message || t("auth.signUpFailed"));
+      const res = await signUpWithMobile({ data: { mobile: m, password, fullName } });
+      if (!res.ok) {
+        toast.error(res.error || t("auth.signUpFailed"));
         return;
       }
-      if (data.session) {
-        navigate({ to: safeRedirect(redirect), replace: true });
-      } else {
-        // Email confirmation is on: the user is NOT signed in until they
-        // click the confirmation link.
-        setPendingEmail(email);
-      }
+      await signInWith(mobileToEmail(m));
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : t("auth.signUpFailed"));
     } finally {
       setBusy(false);
     }
   }
 
-  if (pendingEmail) {
-    return (
-      <div className="flex min-h-screen flex-col">
-        <SiteHeader />
-        <main className="flex flex-1 items-center justify-center px-4">
-          <div className="card-raised max-w-md p-8 text-center">
-            <h1 className="font-display text-2xl font-semibold text-primary">
-              {t("auth.checkEmailTitle")}
-            </h1>
-            <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
-              {t("auth.checkEmailBody", { email: pendingEmail })}
-            </p>
-          </div>
-        </main>
-        <SiteFooter />
+  const mobileField = (
+    <div>
+      <label htmlFor="mobile" className="mb-1 block text-sm font-medium">
+        {t("auth.phone")}
+      </label>
+      <div className="flex">
+        <span className="flex items-center rounded-l-lg border border-r-0 border-input bg-muted px-3 text-sm text-muted-foreground">
+          +91
+        </span>
+        <input
+          id="mobile"
+          type="tel"
+          inputMode="numeric"
+          required
+          autoComplete="tel-national"
+          placeholder="98xxxxxxxx"
+          value={mobile}
+          onChange={(e) => setMobile(e.target.value)}
+          className={`${inputCls} rounded-l-none`}
+        />
       </div>
-    );
-  }
+    </div>
+  );
+
+  const passwordField = (
+    <div>
+      <label htmlFor="password" className="mb-1 block text-sm font-medium">
+        {t("auth.password")}
+      </label>
+      <input
+        id="password"
+        type="password"
+        required
+        minLength={mode === "signup" ? 8 : undefined}
+        autoComplete={mode === "signup" ? "new-password" : "current-password"}
+        value={password}
+        onChange={(e) => setPassword(e.target.value)}
+        className={inputCls}
+      />
+    </div>
+  );
+
+  const isSignup = audience === "devotee" && mode === "signup";
 
   return (
     <div className="flex min-h-screen flex-col">
       <SiteHeader />
       <main className="flex flex-1 items-center justify-center px-4 py-12">
         <div className="card-raised w-full max-w-md p-8">
+          <div className="mb-6 grid grid-cols-2 rounded-lg bg-muted p-1 text-sm font-medium">
+            {(["devotee", "staff"] as const).map((a) => (
+              <button
+                key={a}
+                type="button"
+                onClick={() => {
+                  setAudience(a);
+                  setMode("signin");
+                }}
+                className={`rounded-md px-3 py-2 transition-colors ${
+                  audience === a ? "bg-card text-primary shadow-sm" : "text-muted-foreground"
+                }`}
+              >
+                {a === "devotee" ? "Devotee / Family" : "Temple staff / Admin"}
+              </button>
+            ))}
+          </div>
+
           <h1 className="font-display text-2xl font-semibold text-primary">
-            {mode === "signin" ? t("auth.signInTitle") : t("auth.signUpTitle")}
+            {isSignup ? t("auth.signUpTitle") : t("auth.signInTitle")}
           </h1>
           <p className="mt-2 text-sm text-muted-foreground">
-            {mode === "signin" ? t("auth.signInSubtitle") : t("auth.signUpSubtitle")}
+            {audience === "staff"
+              ? "Temple administrators and platform admins sign in with email."
+              : isSignup
+                ? t("auth.signUpSubtitle")
+                : "Sign in with your mobile number and password."}
           </p>
           <div className="gold-rule mt-4" />
 
-          {mode === "signin" ? (
-            <form onSubmit={handleSignIn} className="mt-6 space-y-4">
-              <div>
-                <label htmlFor="email" className="mb-1 block text-sm font-medium">
-                  {t("auth.email")}
-                </label>
-                <input
-                  id="email"
-                  type="email"
-                  required
-                  autoComplete="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  className="w-full rounded-lg border border-input bg-card px-3 py-2 text-sm"
-                />
-              </div>
-              <div>
-                <label htmlFor="password" className="mb-1 block text-sm font-medium">
-                  {t("auth.password")}
-                </label>
-                <input
-                  id="password"
-                  type="password"
-                  required
-                  autoComplete="current-password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  className="w-full rounded-lg border border-input bg-card px-3 py-2 text-sm"
-                />
-              </div>
-              <button
-                type="submit"
-                disabled={busy}
-                className="flex w-full items-center justify-center gap-2 rounded-lg bg-primary px-4 py-2.5 text-sm font-semibold text-primary-foreground transition-colors hover:bg-primary-deep disabled:opacity-60"
-              >
-                {busy && <Loader2 className="h-4 w-4 animate-spin" />}
-                {t("auth.signIn")}
-              </button>
-            </form>
-          ) : (
+          {isSignup ? (
             <form onSubmit={handleSignUp} className="mt-6 space-y-4">
               <div>
                 <label htmlFor="fullName" className="mb-1 block text-sm font-medium">
@@ -186,55 +202,14 @@ function AuthPage() {
                   autoComplete="name"
                   value={fullName}
                   onChange={(e) => setFullName(e.target.value)}
-                  className="w-full rounded-lg border border-input bg-card px-3 py-2 text-sm"
+                  className={inputCls}
                 />
               </div>
-              <div>
-                <label htmlFor="email" className="mb-1 block text-sm font-medium">
-                  {t("auth.email")}
-                </label>
-                <input
-                  id="email"
-                  type="email"
-                  required
-                  autoComplete="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  className="w-full rounded-lg border border-input bg-card px-3 py-2 text-sm"
-                />
-              </div>
-              <div>
-                <label htmlFor="phone" className="mb-1 block text-sm font-medium">
-                  {t("auth.phone")} <span className="text-muted-foreground">({t("common.optional")})</span>
-                </label>
-                <input
-                  id="phone"
-                  type="tel"
-                  autoComplete="tel"
-                  value={phone}
-                  onChange={(e) => setPhone(e.target.value)}
-                  className="w-full rounded-lg border border-input bg-card px-3 py-2 text-sm"
-                />
-                <p className="mt-1 text-xs text-muted-foreground">{t("auth.phoneHint")}</p>
-              </div>
-              <div>
-                <label htmlFor="password" className="mb-1 block text-sm font-medium">
-                  {t("auth.password")}
-                </label>
-                <input
-                  id="password"
-                  type="password"
-                  required
-                  minLength={8}
-                  autoComplete="new-password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  className="w-full rounded-lg border border-input bg-card px-3 py-2 text-sm"
-                />
-              </div>
+              {mobileField}
+              {passwordField}
               <div>
                 <label htmlFor="confirmPassword" className="mb-1 block text-sm font-medium">
-                  {t("auth.password")} ({t("auth.password").toLowerCase()} again)
+                  Confirm password
                 </label>
                 <input
                   id="confirmPassword"
@@ -243,30 +218,54 @@ function AuthPage() {
                   autoComplete="new-password"
                   value={confirmPassword}
                   onChange={(e) => setConfirmPassword(e.target.value)}
-                  className="w-full rounded-lg border border-input bg-card px-3 py-2 text-sm"
+                  className={inputCls}
                 />
               </div>
-              <button
-                type="submit"
-                disabled={busy}
-                className="flex w-full items-center justify-center gap-2 rounded-lg bg-primary px-4 py-2.5 text-sm font-semibold text-primary-foreground transition-colors hover:bg-primary-deep disabled:opacity-60"
-              >
+              <button type="submit" disabled={busy} className={btnCls}>
                 {busy && <Loader2 className="h-4 w-4 animate-spin" />}
                 {t("auth.signUp")}
               </button>
             </form>
+          ) : (
+            <form onSubmit={handleSignIn} className="mt-6 space-y-4">
+              {audience === "staff" ? (
+                <div>
+                  <label htmlFor="email" className="mb-1 block text-sm font-medium">
+                    {t("auth.email")}
+                  </label>
+                  <input
+                    id="email"
+                    type="email"
+                    required
+                    autoComplete="email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    className={inputCls}
+                  />
+                </div>
+              ) : (
+                mobileField
+              )}
+              {passwordField}
+              <button type="submit" disabled={busy} className={btnCls}>
+                {busy && <Loader2 className="h-4 w-4 animate-spin" />}
+                {t("auth.signIn")}
+              </button>
+            </form>
           )}
 
-          <p className="mt-6 text-center text-sm text-muted-foreground">
-            {mode === "signin" ? t("auth.needAccount") : t("auth.haveAccount")}{" "}
-            <button
-              type="button"
-              onClick={() => setMode(mode === "signin" ? "signup" : "signin")}
-              className="font-medium text-primary hover:underline"
-            >
-              {mode === "signin" ? t("auth.signUp") : t("auth.signIn")}
-            </button>
-          </p>
+          {audience === "devotee" && (
+            <p className="mt-6 text-center text-sm text-muted-foreground">
+              {mode === "signin" ? t("auth.needAccount") : t("auth.haveAccount")}{" "}
+              <button
+                type="button"
+                onClick={() => setMode(mode === "signin" ? "signup" : "signin")}
+                className="font-medium text-primary hover:underline"
+              >
+                {mode === "signin" ? t("auth.signUp") : t("auth.signIn")}
+              </button>
+            </p>
+          )}
           <p className="mt-4 text-center text-xs text-muted-foreground">
             <Link to="/temples" className="hover:underline">
               {t("nav.temples")}
