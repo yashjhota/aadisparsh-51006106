@@ -1,5 +1,5 @@
 import { useMemo, useState } from "react";
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, useRouter } from "@tanstack/react-router";
 import { toast } from "sonner";
 import { Loader2, ShieldAlert, ShieldCheck, Trash2, UserPlus } from "lucide-react";
 
@@ -145,7 +145,7 @@ function AssignForm({ data, onDone }: { data: AdminData; onDone: () => void }) {
   );
 }
 
-function AdminConsole({ data }: { data: AdminData }) {
+function AdminConsole({ data, onDone }: { data: AdminData; onDone: () => void }) {
   const [query, setQuery] = useState("");
   const filteredUsers = useMemo(() => {
     const q = query.trim().toLowerCase();
@@ -177,7 +177,7 @@ function AdminConsole({ data }: { data: AdminData }) {
         <h2 className="font-display text-xl font-semibold text-foreground">Temple staff access</h2>
         <div className="gold-rule mt-3 max-w-16" />
         <div className="card-raised mt-5 p-5">
-          <AssignForm data={data} onDone={revalidate} />
+          <AssignForm data={data} onDone={onDone} />
         </div>
 
         <div className="mt-5 space-y-4">
@@ -296,7 +296,7 @@ function AdminConsole({ data }: { data: AdminData }) {
 
 function AdminPage() {
   const data = Route.useLoaderData();
-  void window.__revalidateAdmin;
+  const router = useRouter();
 
   return (
     <div className="flex min-h-screen flex-col">
@@ -312,7 +312,11 @@ function AdminPage() {
           </p>
           <div className="gold-rule mt-5 max-w-24" />
           <div className="mt-8">
-            {data.authorized ? <AdminConsole data={data} /> : <NotAuthorized />}
+            {data.authorized ? (
+              <AdminConsole data={data} onDone={() => void router.invalidate()} />
+            ) : (
+              <NotAuthorized />
+            )}
           </div>
         </div>
       </main>
