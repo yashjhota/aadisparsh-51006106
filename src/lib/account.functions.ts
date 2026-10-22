@@ -40,6 +40,7 @@ export interface MyAccountData {
   profile: MyProfile | null;
   roles: string[];
   registrations: MyRegistration[];
+  isStaff: boolean;
 }
 
 export const getMyAccount = createServerFn({ method: "GET" })
@@ -47,7 +48,7 @@ export const getMyAccount = createServerFn({ method: "GET" })
   .handler(async ({ context }) => {
     const { supabase, userId } = context;
 
-    const [profileRes, rolesRes, regsRes] = await Promise.all([
+    const [profileRes, rolesRes, regsRes, memRes] = await Promise.all([
       supabase.from("profiles").select("*").eq("id", userId).maybeSingle(),
       supabase.from("user_roles").select("role").eq("user_id", userId),
       supabase
@@ -59,6 +60,12 @@ export const getMyAccount = createServerFn({ method: "GET" })
         )
         .eq("created_by_user_id", userId)
         .order("visit_date", { ascending: false }),
+      supabase
+        .from("temple_memberships")
+        .select("id")
+        .eq("user_id", userId)
+        .in("role", ["temple_admin", "temple_manager"])
+        .limit(1),
     ]);
 
     if (profileRes.error) console.error("getMyAccount profile:", profileRes.error.message);
@@ -68,6 +75,7 @@ export const getMyAccount = createServerFn({ method: "GET" })
       profile: (profileRes.data as unknown as MyProfile) ?? null,
       roles: (rolesRes.data ?? []).map((r) => r.role),
       registrations: (regsRes.data ?? []) as unknown as MyRegistration[],
+      isStaff: (memRes.data ?? []).length > 0,
     } satisfies MyAccountData;
   });
 
