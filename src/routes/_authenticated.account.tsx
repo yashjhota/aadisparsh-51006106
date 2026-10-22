@@ -272,7 +272,7 @@ function AccountPage() {
         <div className="mx-auto max-w-4xl px-4 py-10 sm:px-6">
           <h1 className="font-display text-3xl font-semibold text-primary">{t("account.title")}</h1>
           <p className="mt-1 text-sm text-muted-foreground">
-            {profile?.email}
+            {profile?.email || profile?.phone}
             {profile?.phone_verified ? " · " + t("account.phoneVerified") : ""}
           </p>
           {isSuperadmin && (
