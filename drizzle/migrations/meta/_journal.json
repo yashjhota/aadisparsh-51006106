@@ -15,6 +15,34 @@
       "when": 1792637917813,
       "tag": "0001_fix_booking_result_text_casts",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1792639199219,
+      "tag": "0002_superadmin_setup_bootstrap",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1792639216159,
+      "tag": "0003_enable_pgcrypto",
+      "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1792639233355,
+      "tag": "0004_fix_claim_superadmin_crypt_schema",
+      "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1792639423147,
+      "tag": "0005_fix_claim_superadmin_audit_args",
+      "breakpoints": true
     }
   ]
 }

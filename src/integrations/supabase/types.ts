@@ -14,6 +14,27 @@ export type Database = {
   }
   public: {
     Tables: {
+      app_setup: {
+        Row: {
+          created_at: string
+          id: number
+          setup_code_hash: string | null
+          setup_completed_at: string | null
+        }
+        Insert: {
+          created_at?: string
+          id?: number
+          setup_code_hash?: string | null
+          setup_completed_at?: string | null
+        }
+        Update: {
+          created_at?: string
+          id?: number
+          setup_code_hash?: string | null
+          setup_completed_at?: string | null
+        }
+        Relationships: []
+      }
       audit_logs: {
         Row: {
           action: string
@@ -1276,6 +1297,7 @@ export type Database = {
           isSetofReturn: false
         }
       }
+      claim_superadmin: { Args: { p_code: string }; Returns: boolean }
       get_temple_availability: {
         Args: { p_from: string; p_temple_id: string; p_to: string }
         Returns: {
@@ -1374,6 +1396,7 @@ export type Database = {
           isSetofReturn: false
         }
       }
+      setup_pending: { Args: never; Returns: boolean }
     }
     Enums: {
       app_role:
