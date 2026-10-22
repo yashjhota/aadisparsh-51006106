@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { ArrowRight, Landmark, CalendarHeart, HandHeart } from "lucide-react";
+import { ArrowRight, Landmark, CalendarHeart, HandHeart, type LucideIcon } from "lucide-react";
 
 import { SiteHeader, SiteFooter } from "@/components/site-chrome";
 import { useI18n } from "@/lib/i18n";
@@ -26,7 +26,7 @@ export const Route = createFileRoute("/")({
   component: Home,
 });
 
-const HOW_ICONS = [Landmark, CalendarHeart, HandHeart];
+const HOW_ICONS: LucideIcon[] = [Landmark, CalendarHeart, HandHeart];
 
 function Home() {
   const { t } = useI18n();

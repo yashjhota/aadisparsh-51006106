@@ -157,7 +157,7 @@ function RegistrationCard({
             className="flex items-center gap-1.5 rounded-lg border border-border px-3 py-2 text-sm font-medium text-destructive transition-colors hover:bg-destructive/10 disabled:opacity-50"
           >
             <CalendarX2 className="h-4 w-4" />
-            {t("account.cancelled")}
+            {t("common.cancel")}
           </button>
           <button
             type="button"
@@ -166,7 +166,7 @@ function RegistrationCard({
             className="flex items-center gap-1.5 rounded-lg border border-border px-3 py-2 text-sm font-medium text-foreground transition-colors hover:bg-secondary disabled:opacity-50"
           >
             <CalendarRange className="h-4 w-4" />
-            {t("account.rescheduled")}
+            {t("account.reschedule")}
           </button>
         </div>
       )}
@@ -193,7 +193,7 @@ function RegistrationCard({
             className="flex items-center gap-1.5 rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground transition-colors hover:bg-primary-deep disabled:opacity-50"
           >
             {busy && <Loader2 className="h-4 w-4 animate-spin" />}
-            {t("account.rescheduled")}
+            {t("account.reschedule")}
           </button>
         </div>
       )}
@@ -217,10 +217,10 @@ function AccountPage() {
   const [state, setState] = useState(profile?.state ?? "");
   const [country, setCountry] = useState(profile?.country ?? "");
   const [allowBookingMessages, setAllowBookingMessages] = useState(
-    profile?.communication_preferences?.allow_booking_messages ?? true
+    profile?.communication_preferences?.["allow_booking_messages"] ?? true
   );
   const [allowMediaSharing, setAllowMediaSharing] = useState(
-    profile?.communication_preferences?.allow_media_sharing ?? true
+    profile?.communication_preferences?.["allow_media_sharing"] ?? true
   );
 
   async function handleSave() {
