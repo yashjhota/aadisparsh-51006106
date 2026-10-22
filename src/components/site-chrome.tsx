@@ -104,7 +104,7 @@ export function SiteFooter() {
             <Link to="/temples" className="hover:text-foreground">
               {t("nav.temples")}
             </Link>
-            <Link to="/auth" className="hover:text-foreground">
+            <Link to="/auth" search={{ redirect: undefined }} className="hover:text-foreground">
               {t("nav.signIn")}
             </Link>
           </nav>
