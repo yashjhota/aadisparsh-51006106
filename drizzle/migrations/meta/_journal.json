@@ -15,6 +15,13 @@
       "when": 1792637917813,
       "tag": "0001_fix_booking_result_text_casts",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1792639199219,
+      "tag": "0002_superadmin_setup_bootstrap",
+      "breakpoints": true
     }
   ]
 }
