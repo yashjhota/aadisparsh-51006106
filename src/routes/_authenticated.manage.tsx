@@ -37,6 +37,7 @@ function ManagePage() {
   const [rows, setRows] = useState<RosterRow[]>([]);
   const [loading, setLoading] = useState(false);
   const [busyId, setBusyId] = useState<string | null>(null);
+  const [tab, setTab] = useState<"roster" | "devotees" | "reminders">("roster");
 
   const temple = temples.find((x) => x.id === templeId);
 
