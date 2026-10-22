@@ -129,7 +129,7 @@ export const getAdminData = createServerFn({ method: "GET" })
 
     const users: AdminUser[] = (usersRes.data?.users ?? []).map((u) => ({
       id: u.id,
-      email: u.email,
+      email: u.email ?? null,
       fullName: profileNames.get(u.id) ?? null,
       createdAt: u.created_at ?? "",
     }));
@@ -190,7 +190,7 @@ export const assignTempleRole = createServerFn({ method: "POST" })
     if (existing) {
       const { error } = await supabase
         .from("temple_memberships")
-        .update({ role: data.role, status: "active" })
+        .update({ role: data.role as Database["public"]["Enums"]["app_role"], status: "active" })
         .eq("id", existing.id);
       if (error) {
         console.error("assignTempleRole update:", error.message);
@@ -200,7 +200,7 @@ export const assignTempleRole = createServerFn({ method: "POST" })
       const { error } = await supabase.from("temple_memberships").insert({
         temple_id: data.templeId,
         user_id: data.userId,
-        role: data.role,
+        role: data.role as Database["public"]["Enums"]["app_role"],
         status: "active",
       });
       if (error) {
