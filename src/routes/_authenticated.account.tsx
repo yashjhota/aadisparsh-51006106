@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { createFileRoute, Link, useNavigate, useRouter } from "@tanstack/react-router";
 import { toast } from "sonner";
-import { CalendarX2, CalendarRange, Loader2, MapPin, ShieldCheck } from "lucide-react";
+import { CalendarX2, CalendarRange, Loader2, MapPin, ShieldCheck, Ticket, ClipboardList } from "lucide-react";
 
 import {
   getMyAccount,
@@ -12,6 +12,7 @@ import {
 } from "@/lib/account.functions";
 import { SiteHeader, SiteFooter } from "@/components/site-chrome";
 import { useI18n, type RegistrationStatus } from "@/lib/i18n";
+import { VisitPass } from "@/components/visit-pass";
 
 export const Route = createFileRoute("/_authenticated/account")({
   loader: () => getMyAccount(),
@@ -48,11 +49,14 @@ function statusChipClass(status: string): string {
 
 function RegistrationCard({
   reg,
+  name,
   onChanged,
 }: {
   reg: MyRegistration;
+  name: string;
   onChanged: () => void;
 }) {
+  const [showPass, setShowPass] = useState(false);
   const { t } = useI18n();
   const [busy, setBusy] = useState(false);
   const [rescheduling, setRescheduling] = useState(false);
@@ -149,8 +153,19 @@ function RegistrationCard({
         <p className="mt-3 rounded-lg bg-muted/40 p-3 text-sm text-muted-foreground">{reg.remarks}</p>
       )}
 
+      {showPass && (
+        <VisitPass reg={reg} name={name} occasion={t(`occasion.${reg.occasion_type}`)} onClose={() => setShowPass(false)} />
+      )}
       {isUpcoming && (
         <div className="mt-4 flex flex-wrap gap-2 border-t border-border pt-4">
+          <button
+            type="button"
+            onClick={() => setShowPass(true)}
+            className="flex items-center gap-1.5 rounded-lg bg-primary px-3 py-2 text-sm font-semibold text-primary-foreground"
+          >
+            <Ticket className="h-4 w-4" />
+            Visit pass
+          </button>
           <button
             type="button"
             disabled={busy}
@@ -237,7 +252,7 @@ function RegistrationCard({
 }
 
 function AccountPage() {
-  const { profile, registrations, roles } = Route.useLoaderData();
+  const { profile, registrations, roles, isStaff } = Route.useLoaderData();
   const isSuperadmin = roles.includes("platform_superadmin");
   const navigate = useNavigate();
   const router = useRouter();
@@ -318,6 +333,14 @@ function AccountPage() {
               </Link>
             </p>
           )}
+          {(isStaff || isSuperadmin) && (
+            <p className="mt-2 flex items-center gap-1.5 text-sm">
+              <ClipboardList className="h-4 w-4 text-primary" />
+              <Link to="/manage" className="font-medium text-primary hover:underline">
+                Daily darshan roster
+              </Link>
+            </p>
+          )}
           <div className="gold-rule mt-5 max-w-24" />
 
           <div className="mt-6 flex gap-1 rounded-xl border border-border bg-muted/40 p-1">
@@ -355,7 +378,7 @@ function AccountPage() {
                 ) : (
                   <div className="space-y-4">
                     {upcoming.map((r) => (
-                      <RegistrationCard key={r.id} reg={r} onChanged={onChanged} />
+                      <RegistrationCard key={r.id} reg={r} name={profile?.full_name ?? ""} onChanged={onChanged} />
                     ))}
                   </div>
                 )}
@@ -369,7 +392,7 @@ function AccountPage() {
                         {t("account.past")}
                       </h2>
                       {past.map((r) => (
-                        <RegistrationCard key={r.id} reg={r} onChanged={onChanged} />
+                        <RegistrationCard key={r.id} reg={r} name={profile?.full_name ?? ""} onChanged={onChanged} />
                       ))}
                     </>
                   )}
@@ -379,7 +402,7 @@ function AccountPage() {
                         {t("account.cancelled")}
                       </h2>
                       {other.map((r) => (
-                        <RegistrationCard key={r.id} reg={r} onChanged={onChanged} />
+                        <RegistrationCard key={r.id} reg={r} name={profile?.full_name ?? ""} onChanged={onChanged} />
                       ))}
                     </>
                   )}

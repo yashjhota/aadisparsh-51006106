@@ -15,6 +15,7 @@ import { Route as AuthRouteImport } from './routes/auth'
 import { Route as TemplesRouteImport } from './routes/temples'
 import { Route as AuthenticatedAccountRouteImport } from './routes/_authenticated.account'
 import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated.admin'
+import { Route as AuthenticatedManageRouteImport } from './routes/_authenticated.manage'
 import { Route as AuthenticatedSetupRouteImport } from './routes/_authenticated.setup'
 import { Route as TemplesIndexRouteImport } from './routes/temples.index'
 import { Route as TemplesSlugRouteImport } from './routes/temples.$slug'
@@ -48,6 +49,11 @@ const AuthenticatedAdminRoute = AuthenticatedAdminRouteImport.update({
   path: '/admin',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
+const AuthenticatedManageRoute = AuthenticatedManageRouteImport.update({
+  id: '/manage',
+  path: '/manage',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
 const AuthenticatedSetupRoute = AuthenticatedSetupRouteImport.update({
   id: '/setup',
   path: '/setup',
@@ -70,6 +76,7 @@ export interface FileRoutesByFullPath {
   '/temples': typeof TemplesRouteWithChildren
   '/account': typeof AuthenticatedAccountRoute
   '/admin': typeof AuthenticatedAdminRoute
+  '/manage': typeof AuthenticatedManageRoute
   '/setup': typeof AuthenticatedSetupRoute
   '/temples/$slug': typeof TemplesSlugRoute
   '/temples/': typeof TemplesIndexRoute
@@ -79,6 +86,7 @@ export interface FileRoutesByTo {
   '/auth': typeof AuthRoute
   '/account': typeof AuthenticatedAccountRoute
   '/admin': typeof AuthenticatedAdminRoute
+  '/manage': typeof AuthenticatedManageRoute
   '/setup': typeof AuthenticatedSetupRoute
   '/temples/$slug': typeof TemplesSlugRoute
   '/temples': typeof TemplesIndexRoute
@@ -91,6 +99,7 @@ export interface FileRoutesById {
   '/temples': typeof TemplesRouteWithChildren
   '/_authenticated/account': typeof AuthenticatedAccountRoute
   '/_authenticated/admin': typeof AuthenticatedAdminRoute
+  '/_authenticated/manage': typeof AuthenticatedManageRoute
   '/_authenticated/setup': typeof AuthenticatedSetupRoute
   '/temples/$slug': typeof TemplesSlugRoute
   '/temples/': typeof TemplesIndexRoute
@@ -103,6 +112,7 @@ export interface FileRouteTypes {
     | '/temples'
     | '/account'
     | '/admin'
+    | '/manage'
     | '/setup'
     | '/temples/$slug'
     | '/temples/'
@@ -112,6 +122,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/account'
     | '/admin'
+    | '/manage'
     | '/setup'
     | '/temples/$slug'
     | '/temples'
@@ -123,6 +134,7 @@ export interface FileRouteTypes {
     | '/temples'
     | '/_authenticated/account'
     | '/_authenticated/admin'
+    | '/_authenticated/manage'
     | '/_authenticated/setup'
     | '/temples/$slug'
     | '/temples/'
@@ -179,6 +191,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
+    '/_authenticated/manage': {
+      id: '/_authenticated/manage'
+      path: '/manage'
+      fullPath: '/manage'
+      preLoaderRoute: typeof AuthenticatedManageRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
     '/_authenticated/setup': {
       id: '/_authenticated/setup'
       path: '/setup'
@@ -206,12 +225,14 @@ declare module '@tanstack/react-router' {
 interface AuthenticatedRouteChildren {
   AuthenticatedAccountRoute: typeof AuthenticatedAccountRoute
   AuthenticatedAdminRoute: typeof AuthenticatedAdminRoute
+  AuthenticatedManageRoute: typeof AuthenticatedManageRoute
   AuthenticatedSetupRoute: typeof AuthenticatedSetupRoute
 }
 
 const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedAccountRoute: AuthenticatedAccountRoute,
   AuthenticatedAdminRoute: AuthenticatedAdminRoute,
+  AuthenticatedManageRoute: AuthenticatedManageRoute,
   AuthenticatedSetupRoute: AuthenticatedSetupRoute,
 }
 
