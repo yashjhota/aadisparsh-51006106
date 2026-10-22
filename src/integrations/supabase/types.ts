@@ -429,6 +429,38 @@ export type Database = {
           },
         ]
       }
+      legacy_import_accounts: {
+        Row: {
+          claimed_at: string | null
+          imported_at: string
+          member_number: string
+          source: string
+          user_id: string
+        }
+        Insert: {
+          claimed_at?: string | null
+          imported_at?: string
+          member_number: string
+          source?: string
+          user_id: string
+        }
+        Update: {
+          claimed_at?: string | null
+          imported_at?: string
+          member_number?: string
+          source?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "legacy_import_accounts_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: true
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       media_items: {
         Row: {
           caption: string | null
@@ -597,14 +629,18 @@ export type Database = {
           communication_preferences: Json
           country: string | null
           created_at: string
+          date_of_birth: string | null
           email: string | null
           full_name: string
+          gender: string | null
           id: string
+          legacy_member_number: string | null
           locality: string | null
           phone: string | null
           phone_verified: boolean
           preferred_language: string
           state: string | null
+          street_address: string | null
           updated_at: string
         }
         Insert: {
@@ -612,14 +648,18 @@ export type Database = {
           communication_preferences?: Json
           country?: string | null
           created_at?: string
+          date_of_birth?: string | null
           email?: string | null
           full_name?: string
+          gender?: string | null
           id: string
+          legacy_member_number?: string | null
           locality?: string | null
           phone?: string | null
           phone_verified?: boolean
           preferred_language?: string
           state?: string | null
+          street_address?: string | null
           updated_at?: string
         }
         Update: {
@@ -627,14 +667,18 @@ export type Database = {
           communication_preferences?: Json
           country?: string | null
           created_at?: string
+          date_of_birth?: string | null
           email?: string | null
           full_name?: string
+          gender?: string | null
           id?: string
+          legacy_member_number?: string | null
           locality?: string | null
           phone?: string | null
           phone_verified?: boolean
           preferred_language?: string
           state?: string | null
+          street_address?: string | null
           updated_at?: string
         }
         Relationships: []
@@ -733,6 +777,8 @@ export type Database = {
           created_by_user_id: string
           family_profile_id: string
           id: string
+          legacy_booking_id: string | null
+          legacy_family_members: string | null
           occasion_date: string | null
           occasion_type: Database["public"]["Enums"]["occasion_category"]
           organization_id: string
@@ -755,6 +801,8 @@ export type Database = {
           created_by_user_id: string
           family_profile_id: string
           id?: string
+          legacy_booking_id?: string | null
+          legacy_family_members?: string | null
           occasion_date?: string | null
           occasion_type: Database["public"]["Enums"]["occasion_category"]
           organization_id: string
@@ -777,6 +825,8 @@ export type Database = {
           created_by_user_id?: string
           family_profile_id?: string
           id?: string
+          legacy_booking_id?: string | null
+          legacy_family_members?: string | null
           occasion_date?: string | null
           occasion_type?: Database["public"]["Enums"]["occasion_category"]
           organization_id?: string
@@ -1278,6 +1328,8 @@ export type Database = {
           created_by_user_id: string
           family_profile_id: string
           id: string
+          legacy_booking_id: string | null
+          legacy_family_members: string | null
           occasion_date: string | null
           occasion_type: Database["public"]["Enums"]["occasion_category"]
           organization_id: string
@@ -1377,6 +1429,8 @@ export type Database = {
           created_by_user_id: string
           family_profile_id: string
           id: string
+          legacy_booking_id: string | null
+          legacy_family_members: string | null
           occasion_date: string | null
           occasion_type: Database["public"]["Enums"]["occasion_category"]
           organization_id: string

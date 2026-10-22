@@ -9,3 +9,5 @@
 - [ ] Phase 4: notifications/emails
 - [ ] Phase 5: reporting, dashboards
 - [ ] Phase 6: hardening, audits, publish
+- [x] Import OneDigital members + bookings (CSV) and let imported devotees claim accounts by mobile
+- [x] Database optimization: measure usage, inspect queries/indexes, fix biggest cost drivers

@@ -1,0 +1,2 @@
+CREATE INDEX IF NOT EXISTS idx_profiles_phone ON public.profiles (phone) WHERE phone IS NOT NULL;
+CREATE INDEX IF NOT EXISTS idx_registrations_temple_status_date ON public.registrations (temple_id, status, visit_date);
