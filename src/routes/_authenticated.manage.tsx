@@ -6,6 +6,7 @@ import { Check, Loader2, Search, UserX, Undo2 } from "lucide-react";
 import { getManagedTemples, getRoster, recordAttendance, type RosterRow } from "@/lib/manage.functions";
 import { SiteHeader, SiteFooter } from "@/components/site-chrome";
 import { useI18n } from "@/lib/i18n";
+import { DevoteeDirectory, RemindersPanel } from "@/components/manage-crm";
 
 export const Route = createFileRoute("/_authenticated/manage")({
   loader: () => getManagedTemples(),
@@ -36,6 +37,7 @@ function ManagePage() {
   const [rows, setRows] = useState<RosterRow[]>([]);
   const [loading, setLoading] = useState(false);
   const [busyId, setBusyId] = useState<string | null>(null);
+  const [tab, setTab] = useState<"roster" | "devotees" | "reminders">("roster");
 
   const temple = temples.find((x) => x.id === templeId);
 
@@ -94,9 +96,29 @@ function ManagePage() {
       <SiteHeader />
       <main className="flex-1">
         <div className="mx-auto max-w-5xl px-4 py-10 sm:px-6">
-          <h1 className="font-display text-3xl font-semibold text-primary">Daily darshan roster</h1>
+          <h1 className="font-display text-3xl font-semibold text-primary">Temple Console</h1>
           <div className="gold-rule mt-4 max-w-24" />
 
+          <div role="tablist" className="mt-6 flex flex-wrap gap-2">
+            {([
+              ["roster", "Daily roster"],
+              ["devotees", "Devotees"],
+              ["reminders", "Reminders & greetings"],
+            ] as const).map(([k, label]) => (
+              <button
+                key={k}
+                role="tab"
+                aria-selected={tab === k}
+                onClick={() => setTab(k)}
+                className={`rounded-full px-4 py-2 text-sm font-medium ${tab === k ? "bg-primary text-primary-foreground" : "border border-border bg-card"}`}
+              >
+                {label}
+              </button>
+            ))}
+          </div>
+
+          {tab === "roster" && (
+          <>
           <div className="mt-6 flex flex-wrap items-end gap-3">
             {temples.length > 1 && (
               <label className="text-sm">
@@ -202,6 +224,10 @@ function ManagePage() {
                 </div>
               ))}
           </div>
+          </>
+          )}
+          {tab === "devotees" && temple && <DevoteeDirectory templeId={temple.id} />}
+          {tab === "reminders" && temple && <RemindersPanel templeId={temple.id} templeName={temple.name} />}
         </div>
       </main>
       <SiteFooter />
