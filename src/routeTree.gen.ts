@@ -14,6 +14,8 @@ import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as TemplesRouteImport } from './routes/temples'
 import { Route as AuthenticatedAccountRouteImport } from './routes/_authenticated.account'
+import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated.admin'
+import { Route as AuthenticatedSetupRouteImport } from './routes/_authenticated.setup'
 import { Route as TemplesIndexRouteImport } from './routes/temples.index'
 import { Route as TemplesSlugRouteImport } from './routes/temples.$slug'
 
@@ -41,6 +43,16 @@ const AuthenticatedAccountRoute = AuthenticatedAccountRouteImport.update({
   path: '/account',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
+const AuthenticatedAdminRoute = AuthenticatedAdminRouteImport.update({
+  id: '/admin',
+  path: '/admin',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
+const AuthenticatedSetupRoute = AuthenticatedSetupRouteImport.update({
+  id: '/setup',
+  path: '/setup',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
 const TemplesIndexRoute = TemplesIndexRouteImport.update({
   id: '/',
   path: '/',
@@ -57,6 +69,8 @@ export interface FileRoutesByFullPath {
   '/auth': typeof AuthRoute
   '/temples': typeof TemplesRouteWithChildren
   '/account': typeof AuthenticatedAccountRoute
+  '/admin': typeof AuthenticatedAdminRoute
+  '/setup': typeof AuthenticatedSetupRoute
   '/temples/$slug': typeof TemplesSlugRoute
   '/temples/': typeof TemplesIndexRoute
 }
@@ -64,6 +78,8 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/account': typeof AuthenticatedAccountRoute
+  '/admin': typeof AuthenticatedAdminRoute
+  '/setup': typeof AuthenticatedSetupRoute
   '/temples/$slug': typeof TemplesSlugRoute
   '/temples': typeof TemplesIndexRoute
 }
@@ -74,15 +90,31 @@ export interface FileRoutesById {
   '/auth': typeof AuthRoute
   '/temples': typeof TemplesRouteWithChildren
   '/_authenticated/account': typeof AuthenticatedAccountRoute
+  '/_authenticated/admin': typeof AuthenticatedAdminRoute
+  '/_authenticated/setup': typeof AuthenticatedSetupRoute
   '/temples/$slug': typeof TemplesSlugRoute
   '/temples/': typeof TemplesIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
-    '/' | '/auth' | '/temples' | '/account' | '/temples/$slug' | '/temples/'
+    | '/'
+    | '/auth'
+    | '/temples'
+    | '/account'
+    | '/admin'
+    | '/setup'
+    | '/temples/$slug'
+    | '/temples/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/auth' | '/account' | '/temples/$slug' | '/temples'
+  to:
+    | '/'
+    | '/auth'
+    | '/account'
+    | '/admin'
+    | '/setup'
+    | '/temples/$slug'
+    | '/temples'
   id:
     | '__root__'
     | '/'
@@ -90,6 +122,8 @@ export interface FileRouteTypes {
     | '/auth'
     | '/temples'
     | '/_authenticated/account'
+    | '/_authenticated/admin'
+    | '/_authenticated/setup'
     | '/temples/$slug'
     | '/temples/'
   fileRoutesById: FileRoutesById
@@ -138,6 +172,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAccountRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
+    '/_authenticated/admin': {
+      id: '/_authenticated/admin'
+      path: '/admin'
+      fullPath: '/admin'
+      preLoaderRoute: typeof AuthenticatedAdminRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/setup': {
+      id: '/_authenticated/setup'
+      path: '/setup'
+      fullPath: '/setup'
+      preLoaderRoute: typeof AuthenticatedSetupRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
     '/temples/': {
       id: '/temples/'
       path: '/'
@@ -157,10 +205,14 @@ declare module '@tanstack/react-router' {
 
 interface AuthenticatedRouteChildren {
   AuthenticatedAccountRoute: typeof AuthenticatedAccountRoute
+  AuthenticatedAdminRoute: typeof AuthenticatedAdminRoute
+  AuthenticatedSetupRoute: typeof AuthenticatedSetupRoute
 }
 
 const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedAccountRoute: AuthenticatedAccountRoute,
+  AuthenticatedAdminRoute: AuthenticatedAdminRoute,
+  AuthenticatedSetupRoute: AuthenticatedSetupRoute,
 }
 
 const AuthenticatedRouteWithChildren = AuthenticatedRoute._addFileChildren(

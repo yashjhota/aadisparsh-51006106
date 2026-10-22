@@ -165,14 +165,10 @@ function AdminConsole({ data }: { data: AdminData }) {
     const result = await removeTempleRole({ data: { membershipId } });
     if (result.ok) {
       toast.success("Access removed.");
-      void window.__revalidateAdmin?.();
+      onDone();
     } else {
       toast.error(result.message ?? "Something went wrong.");
     }
-  }
-
-  function revalidate() {
-    // Loader refetch is driven by the router; handled in AdminPage via key below.
   }
 
   return (

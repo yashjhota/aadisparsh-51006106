@@ -1,5 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
+import type { SupabaseClient } from "@supabase/supabase-js";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+import type { Database } from "@/integrations/supabase/types";
 
 /**
  * Platform setup + superadmin administration.
@@ -81,7 +83,10 @@ export const claimSuperadminSetup = createServerFn({ method: "POST" })
     return { claimed: true, message: null };
   });
 
-async function assertSuperadmin(supabase: Parameters<typeof Object>[0] extends never ? never : any, userId: string): Promise<boolean> {
+async function assertSuperadmin(
+  supabase: SupabaseClient<Database>,
+  userId: string
+): Promise<boolean> {
   const { data, error } = await supabase.rpc("is_superadmin", { _user_id: userId });
   if (error) {
     console.error("is_superadmin:", error.message);
