@@ -10,6 +10,7 @@ import {
   type AdminData,
 } from "@/lib/admin.functions";
 import { SiteHeader, SiteFooter } from "@/components/site-chrome";
+import { OnboardTempleForm } from "@/components/onboard-temple";
 
 export const Route = createFileRoute("/_authenticated/admin")({
   loader: () => getAdminData(),
@@ -173,6 +174,12 @@ function AdminConsole({ data, onDone }: { data: AdminData; onDone: () => void })
 
   return (
     <div className="space-y-10">
+      <section>
+        <h2 className="font-display text-xl font-semibold text-foreground">Onboard a new temple</h2>
+        <div className="gold-rule mt-3 max-w-16" />
+        <p className="mt-3 text-sm text-muted-foreground">Creates the trust, city, temple and the trustee's Temple Admin login in one step. Each temple's data stays private to its own staff.</p>
+        <OnboardTempleForm onDone={onDone} />
+      </section>
       <section>
         <h2 className="font-display text-xl font-semibold text-foreground">Temple staff access</h2>
         <div className="gold-rule mt-3 max-w-16" />
