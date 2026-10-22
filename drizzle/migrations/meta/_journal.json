@@ -50,6 +50,13 @@
       "when": 1792640450012,
       "tag": "0006_mobile_signup_profiles",
       "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "7",
+      "when": 1792646987987,
+      "tag": "0007_onedigital_import_columns",
+      "breakpoints": true
     }
   ]
 }
