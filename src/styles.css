@@ -164,3 +164,10 @@
       0 8px 24px -12px oklch(0.3 0.05 40 / 0.12);
   }
 }
+
+@media print {
+  body:has(.visit-pass) * { visibility: hidden; }
+  .visit-pass, .visit-pass * { visibility: visible; }
+  .visit-pass { position: fixed; inset: 0; margin: auto; box-shadow: none; }
+  .visit-pass .no-print { display: none !important; }
+}
