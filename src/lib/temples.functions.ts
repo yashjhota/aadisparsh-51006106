@@ -78,7 +78,7 @@ export const getPublicTempleBySlug = createServerFn({ method: "GET" })
        morning_timings, evening_timings, daily_family_capacity, registration_enabled,
        sunday_blocked, booking_window_months, registration_cutoff_days,
        minimum_accompanying_people, maximum_accompanying_people, remarks_enabled,
-       timezone, city:cities(name, state, slug)`
+       timezone, visit_instructions, city:cities(name, state, slug)`
     )
       .eq("slug", data.slug)
       .eq("status", "active")
