@@ -241,8 +241,7 @@ function AccountPage() {
       });
       if (result.ok) {
         toast.success(t("account.saved"));
-        navigate({ to: "/account", replace: true });
-        await navigate({ to: "/account" });
+        await router.invalidate();
       } else {
         toast.error(t("account.saveFailed"));
       }
@@ -256,8 +255,7 @@ function AccountPage() {
   const other = registrations.filter((r) => r.status === "cancelled" || r.status === "rescheduled");
 
   function onChanged() {
-    navigate({ to: "/account", replace: true });
-    navigate({ to: "/account" });
+    void router.invalidate();
   }
 
   const tabs: { id: Tab; label: string; count?: number }[] = [
