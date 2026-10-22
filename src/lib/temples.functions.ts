@@ -40,6 +40,12 @@ export interface PublicTemple {
   daily_family_capacity: number;
   registration_enabled: boolean;
   sunday_blocked: boolean;
+  booking_window_months: number;
+  registration_cutoff_days: number;
+  minimum_accompanying_people: number;
+  maximum_accompanying_people: number;
+  remarks_enabled: boolean;
+  timezone: string;
   city: { name: string; state: string | null; slug: string } | null;
 }
 
@@ -67,11 +73,13 @@ export const getPublicTempleBySlug = createServerFn({ method: "GET" })
     const supabase = createPublicClient();
     const { data: temple, error } = await supabase
       .from("temples")
-      .select(
-        `id, name, slug, description, locality, address, maps_url, contact_phone,
-         morning_timings, evening_timings, daily_family_capacity, registration_enabled,
-         sunday_blocked, city:cities(name, state, slug)`
-      )
+    .select(
+      `id, name, slug, description, locality, address, maps_url, contact_phone,
+       morning_timings, evening_timings, daily_family_capacity, registration_enabled,
+       sunday_blocked, booking_window_months, registration_cutoff_days,
+       minimum_accompanying_people, maximum_accompanying_people, remarks_enabled,
+       timezone, city:cities(name, state, slug)`
+    )
       .eq("slug", data.slug)
       .eq("status", "active")
       .maybeSingle();
