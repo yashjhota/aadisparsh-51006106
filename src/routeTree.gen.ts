@@ -14,6 +14,7 @@ import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as TemplesRouteImport } from './routes/temples'
 import { Route as AuthenticatedAccountRouteImport } from './routes/_authenticated.account'
+import { Route as TemplesIndexRouteImport } from './routes/temples.index'
 import { Route as TemplesSlugRouteImport } from './routes/temples.$slug'
 
 const IndexRoute = IndexRouteImport.update({
@@ -40,6 +41,11 @@ const AuthenticatedAccountRoute = AuthenticatedAccountRouteImport.update({
   path: '/account',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
+const TemplesIndexRoute = TemplesIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => TemplesRoute,
+} as any)
 const TemplesSlugRoute = TemplesSlugRouteImport.update({
   id: '/$slug',
   path: '/$slug',
@@ -52,13 +58,14 @@ export interface FileRoutesByFullPath {
   '/temples': typeof TemplesRouteWithChildren
   '/account': typeof AuthenticatedAccountRoute
   '/temples/$slug': typeof TemplesSlugRoute
+  '/temples/': typeof TemplesIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
-  '/temples': typeof TemplesRouteWithChildren
   '/account': typeof AuthenticatedAccountRoute
   '/temples/$slug': typeof TemplesSlugRoute
+  '/temples': typeof TemplesIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -68,12 +75,14 @@ export interface FileRoutesById {
   '/temples': typeof TemplesRouteWithChildren
   '/_authenticated/account': typeof AuthenticatedAccountRoute
   '/temples/$slug': typeof TemplesSlugRoute
+  '/temples/': typeof TemplesIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/auth' | '/temples' | '/account' | '/temples/$slug'
+  fullPaths:
+    '/' | '/auth' | '/temples' | '/account' | '/temples/$slug' | '/temples/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/auth' | '/temples' | '/account' | '/temples/$slug'
+  to: '/' | '/auth' | '/account' | '/temples/$slug' | '/temples'
   id:
     | '__root__'
     | '/'
@@ -82,6 +91,7 @@ export interface FileRouteTypes {
     | '/temples'
     | '/_authenticated/account'
     | '/temples/$slug'
+    | '/temples/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -128,6 +138,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAccountRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
+    '/temples/': {
+      id: '/temples/'
+      path: '/'
+      fullPath: '/temples/'
+      preLoaderRoute: typeof TemplesIndexRouteImport
+      parentRoute: typeof TemplesRoute
+    }
     '/temples/$slug': {
       id: '/temples/$slug'
       path: '/$slug'
@@ -152,10 +169,12 @@ const AuthenticatedRouteWithChildren = AuthenticatedRoute._addFileChildren(
 
 interface TemplesRouteChildren {
   TemplesSlugRoute: typeof TemplesSlugRoute
+  TemplesIndexRoute: typeof TemplesIndexRoute
 }
 
 const TemplesRouteChildren: TemplesRouteChildren = {
   TemplesSlugRoute: TemplesSlugRoute,
+  TemplesIndexRoute: TemplesIndexRoute,
 }
 
 const TemplesRouteWithChildren =
