@@ -183,9 +183,9 @@ export const bookRegistration = createServerFn({ method: "POST" })
       p_temple_id: data.templeId,
       p_visit_date: data.visitDate,
       p_occasion: data.occasion,
-      p_occasion_date: data.occasionDate,
+      p_occasion_date: data.occasionDate ?? undefined,
       p_accompanying_people_count: data.accompanyingPeople,
-      p_remarks: data.remarks,
+      p_remarks: data.remarks ?? undefined,
     });
     if (error) {
       console.error("book_registration:", error.message, "user:", userId);
@@ -216,7 +216,7 @@ export const cancelMyRegistration = createServerFn({ method: "POST" })
     const { supabase } = context;
     const { data: reg, error } = await supabase.rpc("cancel_registration", {
       p_registration_id: data.registrationId,
-      p_reason: data.reason,
+      p_reason: data.reason ?? undefined,
     });
     if (error) {
       console.error("cancel_registration:", error.message);
@@ -234,7 +234,7 @@ export const rescheduleMyRegistration = createServerFn({ method: "POST" })
     const { data: result, error } = await supabase.rpc("reschedule_registration", {
       p_registration_id: data.registrationId,
       p_new_date: data.newDate,
-      p_reason: data.reason,
+      p_reason: data.reason ?? undefined,
     });
     if (error) {
       console.error("reschedule_registration:", error.message);
