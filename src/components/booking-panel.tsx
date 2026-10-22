@@ -5,7 +5,7 @@ import { toast } from "sonner";
 import { CalendarDays, ChevronLeft, ChevronRight, Loader2 } from "lucide-react";
 import type { Session } from "@supabase/supabase-js";
 
-import { getPublicAvailability, type PublicTemple } from "@/lib/temples.functions";
+import { getPublicAvailability, type AvailabilityDay, type PublicTemple } from "@/lib/temples.functions";
 import { bookRegistration } from "@/lib/account.functions";
 import { supabase } from "@/integrations/supabase/client";
 import { useI18n } from "@/lib/i18n";
@@ -57,7 +57,7 @@ function toISODate(d: Date) {
   return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
 }
 function fmtLong(iso: string, lang: "en" | "hi") {
-  const [y, m, d] = iso.split("-").map(Number);
+  const [y = 0, m = 1, d = 1] = iso.split("-").map(Number);
   return new Date(y, m - 1, d).toLocaleDateString(lang === "hi" ? "hi-IN" : "en-IN", {
     weekday: "long",
     day: "numeric",
@@ -104,13 +104,13 @@ export function BookingPanel({ temple }: { temple: PublicTemple }) {
   });
 
   const dayMap = useMemo(() => {
-    const map = new Map<string, (typeof data.days)[number]>();
+    const map = new Map<string, AvailabilityDay>();
     for (const day of data?.days ?? []) map.set(day.visit_date, day);
     return map;
   }, [data]);
 
   const todayISO = toISODate(new Date());
-  const [leadYear, leadMonth] = range.from.split("-").map(Number);
+  const [leadYear = 0, leadMonth = 1] = range.from.split("-").map(Number);
   const firstWeekday = new Date(leadYear, leadMonth - 1, 1).getDay();
   const daysInMonth = new Date(leadYear, leadMonth, 0).getDate();
 

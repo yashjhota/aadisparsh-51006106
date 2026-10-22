@@ -14,7 +14,7 @@ export const Route = createFileRoute("/_authenticated")({
     // Client-only subtree (ssr: false), so window access is safe here.
     return supabase.auth.getUser().then(({ data }) => {
       if (!data.user) {
-        throw redirect({ to: "/auth", search: {} });
+        throw redirect({ to: "/auth", search: () => ({ redirect: undefined as string | undefined }) });
       }
     });
   },

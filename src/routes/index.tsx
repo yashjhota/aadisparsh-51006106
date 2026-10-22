@@ -96,7 +96,7 @@ function Home() {
             <div className="gold-rule mx-auto mt-4 max-w-24" />
             <div className="mt-10 grid gap-6 sm:grid-cols-3">
               {(["step1", "step2", "step3"] as const).map((step, i) => {
-                const Icon = HOW_ICONS[i];
+                const Icon = HOW_ICONS[i] ?? Landmark;
                 return (
                   <div key={step} className="card-raised p-6">
                     <div className="flex h-11 w-11 items-center justify-center rounded-full bg-accent/30 text-accent-foreground">
