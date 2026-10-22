@@ -378,7 +378,7 @@ function AccountPage() {
                 ) : (
                   <div className="space-y-4">
                     {upcoming.map((r) => (
-                      <RegistrationCard key={r.id} reg={r} onChanged={onChanged} />
+                      <RegistrationCard key={r.id} reg={r} name={profile?.full_name ?? ""} onChanged={onChanged} />
                     ))}
                   </div>
                 )}
@@ -392,7 +392,7 @@ function AccountPage() {
                         {t("account.past")}
                       </h2>
                       {past.map((r) => (
-                        <RegistrationCard key={r.id} reg={r} onChanged={onChanged} />
+                        <RegistrationCard key={r.id} reg={r} name={profile?.full_name ?? ""} onChanged={onChanged} />
                       ))}
                     </>
                   )}
@@ -402,7 +402,7 @@ function AccountPage() {
                         {t("account.cancelled")}
                       </h2>
                       {other.map((r) => (
-                        <RegistrationCard key={r.id} reg={r} onChanged={onChanged} />
+                        <RegistrationCard key={r.id} reg={r} name={profile?.full_name ?? ""} onChanged={onChanged} />
                       ))}
                     </>
                   )}
