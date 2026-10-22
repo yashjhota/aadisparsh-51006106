@@ -151,7 +151,7 @@ function ManagePage() {
               />
             </label>
             <form
-              className="flex flex-1 gap-2"
+              className="flex min-w-0 flex-1 basis-full gap-2 sm:basis-auto"
               onSubmit={(e) => {
                 e.preventDefault();
                 setActiveSearch(search.trim());
@@ -164,7 +164,7 @@ function ManagePage() {
                 onChange={(e) => setSearch(e.target.value)}
                 className="min-w-0 flex-1 rounded-lg border border-input bg-card px-3 py-2 text-sm"
               />
-              <button type="submit" className="flex items-center gap-1.5 rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground">
+              <button type="submit" className="flex shrink-0 items-center gap-1.5 rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground">
                 <Search className="h-4 w-4" /> Search
               </button>
               {activeSearch && (
