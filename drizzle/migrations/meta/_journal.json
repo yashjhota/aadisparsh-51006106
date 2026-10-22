@@ -36,6 +36,13 @@
       "when": 1792639233355,
       "tag": "0004_fix_claim_superadmin_crypt_schema",
       "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1792639423147,
+      "tag": "0005_fix_claim_superadmin_audit_args",
+      "breakpoints": true
     }
   ]
 }
