@@ -10,33 +10,95 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
+import { Route as AuthRouteImport } from './routes/auth'
+import { Route as TemplesRouteImport } from './routes/temples'
+import { Route as AuthenticatedAccountRouteImport } from './routes/_authenticated.account'
+import { Route as TemplesIndexRouteImport } from './routes/temples.index'
+import { Route as TemplesSlugRouteImport } from './routes/temples.$slug'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuthenticatedRoute = AuthenticatedRouteImport.update({
+  id: '/_authenticated',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthRoute = AuthRouteImport.update({
+  id: '/auth',
+  path: '/auth',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const TemplesRoute = TemplesRouteImport.update({
+  id: '/temples',
+  path: '/temples',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthenticatedAccountRoute = AuthenticatedAccountRouteImport.update({
+  id: '/account',
+  path: '/account',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
+const TemplesIndexRoute = TemplesIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => TemplesRoute,
+} as any)
+const TemplesSlugRoute = TemplesSlugRouteImport.update({
+  id: '/$slug',
+  path: '/$slug',
+  getParentRoute: () => TemplesRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/auth': typeof AuthRoute
+  '/temples': typeof TemplesRouteWithChildren
+  '/account': typeof AuthenticatedAccountRoute
+  '/temples/$slug': typeof TemplesSlugRoute
+  '/temples/': typeof TemplesIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/auth': typeof AuthRoute
+  '/account': typeof AuthenticatedAccountRoute
+  '/temples/$slug': typeof TemplesSlugRoute
+  '/temples': typeof TemplesIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/_authenticated': typeof AuthenticatedRouteWithChildren
+  '/auth': typeof AuthRoute
+  '/temples': typeof TemplesRouteWithChildren
+  '/_authenticated/account': typeof AuthenticatedAccountRoute
+  '/temples/$slug': typeof TemplesSlugRoute
+  '/temples/': typeof TemplesIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths:
+    '/' | '/auth' | '/temples' | '/account' | '/temples/$slug' | '/temples/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to: '/' | '/auth' | '/account' | '/temples/$slug' | '/temples'
+  id:
+    | '__root__'
+    | '/'
+    | '/_authenticated'
+    | '/auth'
+    | '/temples'
+    | '/_authenticated/account'
+    | '/temples/$slug'
+    | '/temples/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AuthenticatedRoute: typeof AuthenticatedRouteWithChildren
+  AuthRoute: typeof AuthRoute
+  TemplesRoute: typeof TemplesRouteWithChildren
 }
 
 declare module '@tanstack/react-router' {
@@ -48,11 +110,81 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_authenticated': {
+      id: '/_authenticated'
+      path: ''
+      fullPath: '/'
+      preLoaderRoute: typeof AuthenticatedRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/auth': {
+      id: '/auth'
+      path: '/auth'
+      fullPath: '/auth'
+      preLoaderRoute: typeof AuthRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/temples': {
+      id: '/temples'
+      path: '/temples'
+      fullPath: '/temples'
+      preLoaderRoute: typeof TemplesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_authenticated/account': {
+      id: '/_authenticated/account'
+      path: '/account'
+      fullPath: '/account'
+      preLoaderRoute: typeof AuthenticatedAccountRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/temples/': {
+      id: '/temples/'
+      path: '/'
+      fullPath: '/temples/'
+      preLoaderRoute: typeof TemplesIndexRouteImport
+      parentRoute: typeof TemplesRoute
+    }
+    '/temples/$slug': {
+      id: '/temples/$slug'
+      path: '/$slug'
+      fullPath: '/temples/$slug'
+      preLoaderRoute: typeof TemplesSlugRouteImport
+      parentRoute: typeof TemplesRoute
+    }
   }
 }
 
+interface AuthenticatedRouteChildren {
+  AuthenticatedAccountRoute: typeof AuthenticatedAccountRoute
+}
+
+const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
+  AuthenticatedAccountRoute: AuthenticatedAccountRoute,
+}
+
+const AuthenticatedRouteWithChildren = AuthenticatedRoute._addFileChildren(
+  AuthenticatedRouteChildren,
+)
+
+interface TemplesRouteChildren {
+  TemplesSlugRoute: typeof TemplesSlugRoute
+  TemplesIndexRoute: typeof TemplesIndexRoute
+}
+
+const TemplesRouteChildren: TemplesRouteChildren = {
+  TemplesSlugRoute: TemplesSlugRoute,
+  TemplesIndexRoute: TemplesIndexRoute,
+}
+
+const TemplesRouteWithChildren =
+  TemplesRoute._addFileChildren(TemplesRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AuthenticatedRoute: AuthenticatedRouteWithChildren,
+  AuthRoute: AuthRoute,
+  TemplesRoute: TemplesRouteWithChildren,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

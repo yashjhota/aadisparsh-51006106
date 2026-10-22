@@ -1,5 +1,6 @@
 import { createServerFn } from "@tanstack/react-start";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+import type { Database } from "@/integrations/supabase/types";
 
 /**
  * Authenticated account data. All queries run as the signed-in user via
@@ -96,7 +97,7 @@ export const updateMyProfile = createServerFn({ method: "POST" })
         city: data.city,
         state: data.state,
         country: data.country,
-        preferred_language: data.preferredLanguage,
+        preferred_language: data.preferredLanguage ?? "en",
         communication_preferences: {
           allow_booking_messages: data.allowBookingMessages,
           allow_media_sharing: data.allowMediaSharing,
@@ -182,10 +183,10 @@ export const bookRegistration = createServerFn({ method: "POST" })
     const { data: result, error } = await supabase.rpc("book_registration", {
       p_temple_id: data.templeId,
       p_visit_date: data.visitDate,
-      p_occasion: data.occasion,
-      p_occasion_date: data.occasionDate,
+      p_occasion: data.occasion as Database["public"]["Functions"]["book_registration"]["Args"]["p_occasion"],
+      ...(data.occasionDate ? { p_occasion_date: data.occasionDate } : {}),
       p_accompanying_people_count: data.accompanyingPeople,
-      p_remarks: data.remarks,
+      ...(data.remarks ? { p_remarks: data.remarks } : {}),
     });
     if (error) {
       console.error("book_registration:", error.message, "user:", userId);
@@ -216,7 +217,7 @@ export const cancelMyRegistration = createServerFn({ method: "POST" })
     const { supabase } = context;
     const { data: reg, error } = await supabase.rpc("cancel_registration", {
       p_registration_id: data.registrationId,
-      p_reason: data.reason,
+      ...(data.reason ? { p_reason: data.reason } : {}),
     });
     if (error) {
       console.error("cancel_registration:", error.message);
@@ -234,7 +235,7 @@ export const rescheduleMyRegistration = createServerFn({ method: "POST" })
     const { data: result, error } = await supabase.rpc("reschedule_registration", {
       p_registration_id: data.registrationId,
       p_new_date: data.newDate,
-      p_reason: data.reason,
+      ...(data.reason ? { p_reason: data.reason } : {}),
     });
     if (error) {
       console.error("reschedule_registration:", error.message);

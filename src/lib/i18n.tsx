@@ -116,8 +116,7 @@ const dictionaries: Record<Language, Record<string, string>> = {
     "account.consentMedia": "Allow the temple to share photographs from my visits with me",
     "account.viewDetails": "Details",
     "account.totalPeople": "{n} people expected",
-    "account.cancelled": "Cancelled",
-    "account.rescheduled": "Rescheduled",
+    "account.reschedule": "Reschedule",
 
     "status.upcoming": "Upcoming",
     "status.completed": "Completed",
@@ -231,8 +230,7 @@ const dictionaries: Record<Language, Record<string, string>> = {
     "account.consentMedia": "मंदिर मेरी यात्राओं के चित्र मुझे भेज सके",
     "account.viewDetails": "विवरण",
     "account.totalPeople": "{n} व्यक्ति प्रत्याशित",
-    "account.cancelled": "रद्द",
-    "account.rescheduled": "पुनर्निर्धारित",
+    "account.reschedule": "पुनर्निर्धारित करें",
 
     "status.upcoming": "आगामी",
     "status.completed": "पूर्ण",
