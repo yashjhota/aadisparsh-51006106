@@ -57,6 +57,13 @@
       "when": 1792646987987,
       "tag": "0007_onedigital_import_columns",
       "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "7",
+      "when": 1792647361053,
+      "tag": "0008_index_profiles_phone",
+      "breakpoints": true
     }
   ]
 }
