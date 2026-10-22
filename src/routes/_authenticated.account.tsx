@@ -57,12 +57,13 @@ function RegistrationCard({
   const [busy, setBusy] = useState(false);
   const [rescheduling, setRescheduling] = useState(false);
   const [newDate, setNewDate] = useState("");
+  const [confirmingCancel, setConfirmingCancel] = useState(false);
 
   const total = 1 + reg.accompanying_people_count;
   const isUpcoming = reg.status === "upcoming";
 
   async function handleCancel() {
-    if (!window.confirm(`Cancel visit ${reg.registration_number} on ${reg.visit_date}?`)) return;
+    setConfirmingCancel(false);
     setBusy(true);
     try {
       const result = await cancelMyRegistration({
@@ -153,7 +154,10 @@ function RegistrationCard({
           <button
             type="button"
             disabled={busy}
-            onClick={handleCancel}
+            onClick={() => {
+              setRescheduling(false);
+              setConfirmingCancel((v) => !v);
+            }}
             className="flex items-center gap-1.5 rounded-lg border border-border px-3 py-2 text-sm font-medium text-destructive transition-colors hover:bg-destructive/10 disabled:opacity-50"
           >
             <CalendarX2 className="h-4 w-4" />
@@ -162,7 +166,10 @@ function RegistrationCard({
           <button
             type="button"
             disabled={busy}
-            onClick={() => setRescheduling((v) => !v)}
+            onClick={() => {
+              setConfirmingCancel(false);
+              setRescheduling((v) => !v);
+            }}
             className="flex items-center gap-1.5 rounded-lg border border-border px-3 py-2 text-sm font-medium text-foreground transition-colors hover:bg-secondary disabled:opacity-50"
           >
             <CalendarRange className="h-4 w-4" />
@@ -170,6 +177,34 @@ function RegistrationCard({
           </button>
         </div>
       )}
+
+      {isUpcoming && confirmingCancel && (
+        <div className="mt-3 flex flex-wrap items-center justify-between gap-2 rounded-lg border border-destructive/30 bg-destructive/5 p-3">
+          <p className="text-sm text-foreground">
+            Cancel visit {reg.registration_number} on {reg.visit_date}?
+          </p>
+          <div className="flex gap-2">
+            <button
+              type="button"
+              disabled={busy}
+              onClick={() => setConfirmingCancel(false)}
+              className="rounded-lg border border-border px-3 py-2 text-sm font-medium text-foreground hover:bg-secondary"
+            >
+              Keep visit
+            </button>
+            <button
+              type="button"
+              disabled={busy}
+              onClick={handleCancel}
+              className="flex items-center gap-1.5 rounded-lg bg-destructive px-3 py-2 text-sm font-semibold text-destructive-foreground disabled:opacity-50"
+            >
+              {busy && <Loader2 className="h-4 w-4 animate-spin" />}
+              Yes, cancel visit
+            </button>
+          </div>
+        </div>
+      )}
+
 
       {isUpcoming && rescheduling && (
         <div className="mt-3 flex flex-wrap items-end gap-2 rounded-lg border border-border bg-muted/30 p-3">
