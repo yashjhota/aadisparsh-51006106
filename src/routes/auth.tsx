@@ -57,7 +57,7 @@ function AuthPage() {
     try {
       const { error } = await supabase.auth.signInWithPassword({ email, password });
       if (error) {
-        toast.error(t("auth.signInFailed"));
+        toast.error(error.message || t("auth.signInFailed"));
         return;
       }
       navigate({ to: safeRedirect(redirect), replace: true });
@@ -87,7 +87,7 @@ function AuthPage() {
         },
       });
       if (error) {
-        toast.error(t("auth.signUpFailed"));
+        toast.error(error.message || t("auth.signUpFailed"));
         return;
       }
       if (data.session) {
