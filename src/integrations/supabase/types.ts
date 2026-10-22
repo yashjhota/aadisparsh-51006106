@@ -1216,14 +1216,6 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      __test_phase0: {
-        Args: never
-        Returns: {
-          detail: string
-          outcome: string
-          step: string
-        }[]
-      }
       book_registration: {
         Args: {
           p_accompanying_people_count?: number
