@@ -144,6 +144,19 @@ export const onboardTemple = createServerFn({ method: "POST" })
     let trusteeId = existingProfile?.id ?? null;
     if (!trusteeId && password.length < 8) return { ok: false, message: "Set a password of at least 8 characters for the trustee." };
 
+    if (!trusteeId) {
+      const { data: created, error: uErr } = await db.auth.admin.createUser({
+        email,
+        password,
+        email_confirm: true,
+        user_metadata: { full_name: trusteeName },
+      });
+      if (uErr || !created.user) {
+        console.error("onboard user:", uErr?.message);
+        return { ok: false, message: /weak|pwned|guess/i.test(uErr?.message ?? "") ? "That password is too common. Choose a stronger one." : "Could not create the trustee login." };
+      }
+      trusteeId = created.user.id;
+    }
     const base = slugify(trustName) || "trust";
     const orgSlug = `${base}-${Math.random().toString(36).slice(2, 6)}`;
     const { data: org, error: oErr } = await db.from("organizations").insert({ name: trustName, slug: orgSlug }).select("id").single();
@@ -173,19 +186,6 @@ export const onboardTemple = createServerFn({ method: "POST" })
       return { ok: false, message: "Could not create the temple." };
     }
 
-    if (!trusteeId) {
-      const { data: created, error: uErr } = await db.auth.admin.createUser({
-        email,
-        password,
-        email_confirm: true,
-        user_metadata: { full_name: trusteeName },
-      });
-      if (uErr || !created.user) {
-        console.error("onboard user:", uErr?.message);
-        return { ok: false, message: "Temple created, but the trustee login could not be created. Grant access below instead." };
-      }
-      trusteeId = created.user.id;
-    }
     const { error: mErr } = await db
       .from("temple_memberships")
       .insert({ temple_id: temple.id, user_id: trusteeId, role: "temple_admin", status: "active" });
