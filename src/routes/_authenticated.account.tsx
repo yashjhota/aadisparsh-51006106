@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate, useRouter } from "@tanstack/react-router";
 import { toast } from "sonner";
 import { CalendarX2, CalendarRange, Loader2, MapPin } from "lucide-react";
 
@@ -11,7 +11,7 @@ import {
   type MyRegistration,
 } from "@/lib/account.functions";
 import { SiteHeader, SiteFooter } from "@/components/site-chrome";
-import { REGISTRATION_STATUSES, useI18n, type RegistrationStatus } from "@/lib/i18n";
+import { useI18n, type RegistrationStatus } from "@/lib/i18n";
 
 export const Route = createFileRoute("/_authenticated/account")({
   loader: () => getMyAccount(),
@@ -204,6 +204,7 @@ function RegistrationCard({
 function AccountPage() {
   const { profile, registrations } = Route.useLoaderData();
   const navigate = useNavigate();
+  const router = useRouter();
   const { t, lang, setLang } = useI18n();
   const [tab, setTab] = useState<Tab>("registrations");
   const [saving, setSaving] = useState(false);
