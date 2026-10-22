@@ -7,6 +7,7 @@ import { getManagedTemples, getRoster, recordAttendance, type RosterRow } from "
 import { SiteHeader, SiteFooter } from "@/components/site-chrome";
 import { useI18n } from "@/lib/i18n";
 import { DevoteeDirectory, RemindersPanel } from "@/components/manage-crm";
+import { TempleSettingsPanel } from "@/components/temple-settings";
 
 export const Route = createFileRoute("/_authenticated/manage")({
   loader: () => getManagedTemples(),
@@ -37,7 +38,7 @@ function ManagePage() {
   const [rows, setRows] = useState<RosterRow[]>([]);
   const [loading, setLoading] = useState(false);
   const [busyId, setBusyId] = useState<string | null>(null);
-  const [tab, setTab] = useState<"roster" | "devotees" | "reminders">("roster");
+  const [tab, setTab] = useState<"roster" | "devotees" | "reminders" | "settings">("roster");
 
   const temple = temples.find((x) => x.id === templeId);
 
@@ -104,6 +105,7 @@ function ManagePage() {
               ["roster", "Daily roster"],
               ["devotees", "Devotees"],
               ["reminders", "Reminders & greetings"],
+              ["settings", "Temple details & rules"],
             ] as const).map(([k, label]) => (
               <button
                 key={k}
@@ -228,6 +230,7 @@ function ManagePage() {
           )}
           {tab === "devotees" && temple && <DevoteeDirectory templeId={temple.id} />}
           {tab === "reminders" && temple && <RemindersPanel templeId={temple.id} templeName={temple.name} />}
+          {tab === "settings" && temple && <TempleSettingsPanel templeId={temple.id} slug={temple.slug} />}
         </div>
       </main>
       <SiteFooter />
