@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { createFileRoute, Link, useNavigate, useRouter } from "@tanstack/react-router";
 import { toast } from "sonner";
-import { CalendarX2, CalendarRange, Loader2, MapPin } from "lucide-react";
+import { CalendarX2, CalendarRange, Loader2, MapPin, ShieldCheck } from "lucide-react";
 
 import {
   getMyAccount,
@@ -202,7 +202,8 @@ function RegistrationCard({
 }
 
 function AccountPage() {
-  const { profile, registrations } = Route.useLoaderData();
+  const { profile, registrations, roles } = Route.useLoaderData();
+  const isSuperadmin = roles.includes("platform_superadmin");
   const navigate = useNavigate();
   const router = useRouter();
   const { t, lang, setLang } = useI18n();
@@ -274,6 +275,14 @@ function AccountPage() {
             {profile?.email}
             {profile?.phone_verified ? " · " + t("account.phoneVerified") : ""}
           </p>
+          {isSuperadmin && (
+            <p className="mt-2 flex items-center gap-1.5 text-sm">
+              <ShieldCheck className="h-4 w-4 text-primary" />
+              <Link to="/admin" className="font-medium text-primary hover:underline">
+                Platform administration
+              </Link>
+            </p>
+          )}
           <div className="gold-rule mt-5 max-w-24" />
 
           <div className="mt-6 flex gap-1 rounded-xl border border-border bg-muted/40 p-1">
