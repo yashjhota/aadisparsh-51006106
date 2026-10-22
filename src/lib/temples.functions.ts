@@ -31,6 +31,7 @@ export interface PublicTemple {
   name: string;
   slug: string;
   description: string | null;
+  visit_instructions?: string | null;
   locality: string | null;
   address: string | null;
   maps_url: string | null;

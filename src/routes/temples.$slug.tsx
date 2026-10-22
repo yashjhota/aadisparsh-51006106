@@ -146,6 +146,12 @@ function TempleDetailPage() {
                   </p>
                 )}
               </div>
+              {temple.visit_instructions && (
+                <div className="card-raised mt-6 p-5 text-sm">
+                  <h2 className="font-display text-base font-semibold text-foreground">Rules for visitors</h2>
+                  <p className="mt-2 whitespace-pre-line leading-relaxed text-muted-foreground">{temple.visit_instructions}</p>
+                </div>
+              )}
             </div>
 
             {/* Booking */}
