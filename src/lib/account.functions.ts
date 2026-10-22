@@ -172,6 +172,24 @@ function mapBookingError(raw: string): { code: string; message: string } {
   if (msg.includes("SAME_DATE")) {
     return { code: "SAME_DATE", message: "Please choose a different date to reschedule to." };
   }
+  if (msg.includes("PAST_CANCELLATION_CUTOFF")) {
+    return { code: "PAST_CANCELLATION_CUTOFF", message: "This visit is too close to cancel online. Please contact the temple office." };
+  }
+  if (msg.includes("PAST_RESCHEDULE_CUTOFF")) {
+    return { code: "PAST_RESCHEDULE_CUTOFF", message: "This visit is too close to reschedule online. Please contact the temple office." };
+  }
+  if (msg.includes("DUPLICATE_ACTIVE_BOOKING")) {
+    return { code: "DUPLICATE", message: "You already have a visit reserved for that day." };
+  }
+  if (msg.includes("INVALID_STATUS_TRANSITION")) {
+    return { code: "INVALID_STATUS", message: "This visit is no longer upcoming, so it can't be changed." };
+  }
+  if (msg.includes("FORBIDDEN")) {
+    return { code: "FORBIDDEN", message: "You can only change your own visits." };
+  }
+  if (msg.includes("REGISTRATION_NOT_FOUND")) {
+    return { code: "NOT_FOUND", message: "This visit could not be found." };
+  }
   return { code: "UNKNOWN", message: "Something went wrong. Please try again." };
 }
 
