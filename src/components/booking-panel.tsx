@@ -160,12 +160,12 @@ export function BookingPanel({ temple }: { temple: PublicTemple }) {
 
   return (
     <div className="card-raised p-5 sm:p-6">
-      <div className="flex items-center justify-between">
-        <h2 className="font-display text-xl font-semibold text-foreground">
+      <div className="flex flex-wrap items-center justify-between gap-2">
+        <h2 className="min-w-0 font-display text-lg font-semibold text-foreground sm:text-xl">
           <CalendarDays className="mr-2 inline h-5 w-5 text-gold" />
           {t("temples.book")}
         </h2>
-        <div className="flex items-center gap-1">
+        <div className="flex shrink-0 items-center gap-1">
           <button
             type="button"
             disabled={prevDisabled}

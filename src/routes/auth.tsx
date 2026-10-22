@@ -158,8 +158,8 @@ function AuthPage() {
     <div className="flex min-h-screen flex-col">
       <SiteHeader />
       <main className="flex flex-1 items-center justify-center px-4 py-12">
-        <div className="card-raised w-full max-w-md p-8">
-          <div className="mb-6 grid grid-cols-2 rounded-lg bg-muted p-1 text-sm font-medium">
+        <div className="card-raised w-full max-w-md p-6 sm:p-8">
+          <div className="mb-6 grid grid-cols-2 rounded-lg bg-muted p-1 text-xs font-medium sm:text-sm">
             {(["devotee", "staff"] as const).map((a) => (
               <button
                 key={a}
@@ -168,7 +168,7 @@ function AuthPage() {
                   setAudience(a);
                   setMode("signin");
                 }}
-                className={`rounded-md px-3 py-2 transition-colors ${
+                className={`rounded-md px-2 py-2 transition-colors sm:px-3 ${
                   audience === a ? "bg-card text-primary shadow-sm" : "text-muted-foreground"
                 }`}
               >
