@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { Link, useNavigate } from "@tanstack/react-router";
 import { useQueryClient } from "@tanstack/react-query";
 import type { Session } from "@supabase/supabase-js";
-import { LogOut, User } from "lucide-react";
+import { ClipboardList, LogOut, User } from "lucide-react";
 
 import { supabase } from "@/integrations/supabase/client";
 import { useI18n } from "@/lib/i18n";
@@ -12,6 +12,7 @@ export function SiteHeader() {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const [session, setSession] = useState<Session | null>(null);
+  const [isStaff, setIsStaff] = useState(false);
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data }) => setSession(data.session));
@@ -24,6 +25,30 @@ export function SiteHeader() {
     });
     return () => subscription.unsubscribe();
   }, []);
+
+  const userId = session?.user.id;
+  useEffect(() => {
+    if (!userId) {
+      setIsStaff(false);
+      return;
+    }
+    let active = true;
+    Promise.all([
+      supabase
+        .from("temple_memberships")
+        .select("id")
+        .eq("user_id", userId)
+        .in("role", ["temple_admin", "temple_manager"])
+        .eq("status", "active")
+        .limit(1),
+      supabase.rpc("is_superadmin", { _user_id: userId }),
+    ]).then(([mem, sup]) => {
+      if (active) setIsStaff((mem.data ?? []).length > 0 || sup.data === true);
+    });
+    return () => {
+      active = false;
+    };
+  }, [userId]);
 
   async function handleSignOut() {
     await queryClient.cancelQueries();
@@ -59,6 +84,15 @@ export function SiteHeader() {
           </button>
           {session ? (
             <div className="flex items-center gap-1">
+              {isStaff && (
+                <Link
+                  to="/manage"
+                  className="flex items-center gap-1.5 rounded-md px-3 py-2 text-sm font-medium text-primary transition-colors hover:bg-secondary"
+                >
+                  <ClipboardList className="h-4 w-4" />
+                  <span className="hidden sm:inline">Temple Console</span>
+                </Link>
+              )}
               <Link
                 to="/account"
                 className="flex items-center gap-1.5 rounded-md bg-secondary px-3 py-2 text-sm font-medium text-secondary-foreground transition-colors hover:bg-accent"

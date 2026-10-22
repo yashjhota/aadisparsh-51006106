@@ -172,7 +172,7 @@ function AuthPage() {
                   audience === a ? "bg-card text-primary shadow-sm" : "text-muted-foreground"
                 }`}
               >
-                {a === "devotee" ? "Devotee / Family" : "Temple staff / Admin"}
+                {a === "devotee" ? "Devotee / Family" : "Temple Admin & Manager"}
               </button>
             ))}
           </div>
@@ -182,7 +182,7 @@ function AuthPage() {
           </h1>
           <p className="mt-2 text-sm text-muted-foreground">
             {audience === "staff"
-              ? "Temple administrators and platform admins sign in with email."
+              ? "Temple admins, temple managers and platform admins sign in here with email."
               : isSignup
                 ? t("auth.signUpSubtitle")
                 : "Sign in with your mobile number and password."}
