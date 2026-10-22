@@ -184,9 +184,9 @@ export const bookRegistration = createServerFn({ method: "POST" })
       p_temple_id: data.templeId,
       p_visit_date: data.visitDate,
       p_occasion: data.occasion as Database["public"]["Functions"]["book_registration"]["Args"]["p_occasion"],
-      p_occasion_date: data.occasionDate ?? undefined,
+      ...(data.occasionDate ? { p_occasion_date: data.occasionDate } : {}),
       p_accompanying_people_count: data.accompanyingPeople,
-      p_remarks: data.remarks ?? undefined,
+      ...(data.remarks ? { p_remarks: data.remarks } : {}),
     });
     if (error) {
       console.error("book_registration:", error.message, "user:", userId);
