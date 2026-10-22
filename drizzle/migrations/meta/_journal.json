@@ -43,6 +43,13 @@
       "when": 1792639423147,
       "tag": "0005_fix_claim_superadmin_audit_args",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1792640450012,
+      "tag": "0006_mobile_signup_profiles",
+      "breakpoints": true
     }
   ]
 }
